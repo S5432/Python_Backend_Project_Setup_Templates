@@ -1,0 +1,43 @@
+
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.dependencies.database import get_db_session
+
+
+router = APIRouter(tags=["Health"])
+
+DatabaseSession = Annotated[
+    AsyncSession,
+    Depends(get_db_session),
+]
+
+
+@router.get("/live")
+async def liveness_check() -> dict[str, str]:
+    return {"status": "alive"}
+
+
+@router.get("/ready")
+async def readiness_check(
+    session: DatabaseSession,
+) -> dict[str, str]:
+    try:
+        result = await session.execute(text("SELECT 1"))
+        result.scalar_one()
+
+    except SQLAlchemyError as exc:
+        # Keep database details out of the public response.
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database is not ready",
+        ) from exc
+
+    return {
+        "status": "ready",
+        "database": "connected",
+    }

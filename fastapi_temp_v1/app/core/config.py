@@ -7,9 +7,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "ShvetVarni FastAPI Template"
-    app_env: Literal["development", "test", "staging", "production"] = (
-        "development"
-    )
+
+    app_env: Literal[
+        "development",
+        "test",
+        "staging",
+        "production",
+    ] = "development"
     debug: bool = False
     api_v1_prefix: str = "/api/v1"
 

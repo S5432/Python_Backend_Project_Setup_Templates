@@ -8,7 +8,7 @@ from app.core.security import hash_password
 from app.db.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate
-
+from app.schemas.user import UserProfileUpdate
 
 class UserAlreadyExistsError(Exception):
     """Raised when an email address is already registered."""
@@ -55,3 +55,29 @@ class UserService:
             raise UserAlreadyExistsError(
                 "An account with this email already exists."
             ) from exc
+
+    
+    # async def update_profile(
+    #     self,
+    #     user: User,
+    #     payload: UserProfileUpdate,
+    # ) -> User:
+    #     async with self.session.begin():
+    #         user.full_name = payload.full_name
+    #         await self.session.flush()
+    #         await self.session.refresh(user)
+
+    #     return user
+
+    async def update_profile(
+    self,
+    user: User,
+    payload: UserProfileUpdate,
+    ) -> User:
+        user.full_name = payload.full_name
+
+        await self.session.flush()
+        await self.session.commit()
+        await self.session.refresh(user)
+
+        return user

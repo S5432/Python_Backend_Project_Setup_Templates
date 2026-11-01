@@ -9,6 +9,7 @@ from sqlalchemy import (
     String,
     func,
     text,
+    Integer,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -65,3 +66,12 @@ class User(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    token_version: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+    )
+
+

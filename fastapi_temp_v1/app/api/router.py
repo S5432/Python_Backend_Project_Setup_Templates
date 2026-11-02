@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import health, users, auth
+from app.api.routes import health, users, auth, admin
 
 api_router = APIRouter()
 
@@ -21,4 +21,10 @@ api_router.include_router(
     auth.router,
     prefix="/auth",
     tags=["Authentication"],
+)
+
+api_router.include_router(
+    admin.router, 
+    prefix="/rbac", 
+    tags=["RBAC and Authorization"],
 )

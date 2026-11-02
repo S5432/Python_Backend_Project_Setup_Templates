@@ -11,9 +11,11 @@ from sqlalchemy import (
     text,
     Integer,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.db.models.user_role import user_roles
+# from app.db.models.role import Role
 
 
 class User(Base):
@@ -73,5 +75,12 @@ class User(Base):
         default=0,
         server_default=text("0"),
     )
+
+    roles: Mapped[list["Role"]] = relationship(
+        secondary=user_roles, back_populates="users", lazy="selectin"
+    )
+
+
+
 
 

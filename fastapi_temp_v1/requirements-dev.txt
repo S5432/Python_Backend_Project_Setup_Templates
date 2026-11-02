@@ -1,2 +1,5 @@
 pytest
 httpx
+pytest-asyncio==1.4.1.post1
+httpx==0.28.1
+asgi-lifespan==2.1.0

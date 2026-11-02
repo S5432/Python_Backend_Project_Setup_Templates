@@ -152,3 +152,79 @@ The full suite includes your existing health and user tests as well as the new R
 After running the migration and tests, share the complete terminal output if anything fails. We should resolve those failures and verify the entire RBAC matrix before marking Phase 4 complete and moving to Phase 5.
 
 All test passed but only rbac one test not passed and i alos test on the swagger UI it working perfectly.
+
+Current folder strcuture : 
+
+shvetvarni-fastapi-template/
+├── app/
+│   ├── main.py
+│   ├── core/
+│   │   ├── config.py
+│   │   ├── security.py
+│   │   ├── exceptions.py
+│   │   ├── exception_handlers.py
+│   │   ├── logging_config.py
+│   │   ├── constants.py
+│   │   └── lifespan.py
+│   ├── db/
+│   │   ├── base.py
+│   │   ├── session.py
+│   │   └── models/
+│   │       ├── __init__.py
+│   │       ├── user.py
+|   |       |-- role.py
+|   |       |-- user_role.py
+│   │       └── refresh_token.py
+│   ├── schemas/
+│   │   ├── auth.py
+│   │   ├── user.py
+│   │   └── common.py
+│   ├── api/
+│   │   ├── router.py
+│   │   └── routes/
+│   │       ├── auth.py
+│   │       ├── users.py
+│   │       ├── admin.py
+│   │       └── health.py
+│   ├── repositories/
+│   │   ├── user_repository.py
+|   |   |-- role_repository.py 
+│   │   └── refresh_token_repository.py
+│   ├── services/
+│   │   ├── auth_service.py
+│   │   ├── user_service.py
+│   │   └── email_service.py
+│   ├── dependencies/
+│   │   ├── database.py
+│   │   ├── auth.py
+│   │   └── permissions.py
+│   ├── middleware/
+│   │   ├── request_id.py
+│   │   └── logging.py
+│   └── workers/
+│       ├── celery_app.py
+│       └── tasks/
+│           ├── __init__.py
+│           └── email_tasks.py
+├── alembic/
+│   ├── env.py
+│   └── versions/
+├── scripts/
+│   └── create_admin.py
+├── tests/
+│   ├── conftest.py
+│   ├── unit/
+│   ├── integration/
+│   ├── api/
+│   └── security/
+├── .env.example
+├── .gitignore
+├── .dockerignore
+├── alembic.ini
+|-- pytest.init
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+
+

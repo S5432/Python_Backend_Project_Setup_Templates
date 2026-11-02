@@ -14,6 +14,12 @@ from app.services.user_service import (
 )
 
 
+import hashlib
+from datetime import datetime, timezone
+
+from sqlalchemy import select
+from app.db.models.email_verification_token import EmailVerificationToken
+
 router = APIRouter()
 
 
@@ -44,6 +50,67 @@ async def register_user(
         ) from exc
 
     return UserRead.model_validate(user)
+
+
+
+@router.post(
+    "/verify-email",
+    status_code=status.HTTP_200_OK,
+    summary="Verify an email address",
+)
+async def verify_email(
+    token: str,
+    session: DatabaseSession,
+) -> dict[str, str]:
+    token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+    now = datetime.now(timezone.utc)
+
+    async with session.begin():
+        result = await session.execute(
+            select(EmailVerificationToken)
+            .where(EmailVerificationToken.token_hash == token_hash)
+            .with_for_update()
+        )
+        verification_token = result.scalar_one_or_none()
+
+        if verification_token is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired verification link.",
+            )
+
+        if verification_token.consumed_at is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired verification link.",
+            )
+
+        # Normalize to UTC if a database driver returns a naive timestamp.
+        expiry = verification_token.expires_at
+        if expiry.tzinfo is None:
+            expiry = expiry.replace(tzinfo=timezone.utc)
+
+        if expiry <= now:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired verification link.",
+            )
+
+        user_result = await session.execute(
+            select(User).where(User.id == verification_token.user_id)
+        )
+        user = user_result.scalar_one_or_none()
+
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired verification link.",
+            )
+
+        user.is_verified = True
+        verification_token.consumed_at = now
+
+    return {"message": "Email verified successfully."}
 
 
 @router.get("/me", response_model=UserRead)

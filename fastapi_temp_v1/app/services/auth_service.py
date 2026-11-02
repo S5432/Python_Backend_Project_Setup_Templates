@@ -31,6 +31,9 @@ class InvalidCredentialsError(Exception):
 class InvalidRefreshTokenError(Exception):
     """Refresh token is invalid, expired, revoked, or reused."""
 
+class EmailNotVerifiedError(Exception):
+    """Raised when an account has not verified its email."""
+
 
 class AuthService:
     def __init__(self, session: AsyncSession) -> None:
@@ -68,6 +71,11 @@ class AuthService:
 
             if user is None:
                 raise InvalidCredentialsError()
+
+            if not user.is_verified:
+                raise EmailNotVerifiedError(
+                    "Please verify your email address before logging in."
+                )
 
             valid_password = await verify_password_async(
                 password,

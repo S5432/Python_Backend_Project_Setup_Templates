@@ -1,6 +1,9 @@
 
 import uuid
 from datetime import datetime
+import sqlalchemy as sa
+from sqlalchemy import Boolean
+from sqlalchemy.orm import Mapped, mapped_column,  relationship
 
 from sqlalchemy import (
     Boolean,
@@ -11,7 +14,7 @@ from sqlalchemy import (
     text,
     Integer,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 from app.db.base import Base
 from app.db.models.user_role import user_roles
@@ -78,6 +81,13 @@ class User(Base):
 
     roles: Mapped[list["Role"]] = relationship(
         secondary=user_roles, back_populates="users", lazy="selectin"
+    )
+
+    is_verified: Mapped[bool] = mapped_column(
+    Boolean,
+    default=False,
+    server_default=sa.false(),
+    nullable=False,
     )
 
 

@@ -155,7 +155,7 @@ All test passed but only rbac one test not passed and i alos test on the swagger
 
 Current folder strcuture : 
 
-shvetvarni-fastapi-template/
+fastapi_temp_v1/
 ├── app/
 │   ├── main.py
 │   ├── core/

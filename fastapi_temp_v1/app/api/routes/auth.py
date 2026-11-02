@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 from redis.exceptions import RedisError
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.services.auth_service import EmailNotVerifiedError
 
 from app.core.security import decode_access_token
 from app.dependencies.auth import CurrentUser, DatabaseSession, bearer_scheme
@@ -54,6 +55,12 @@ async def login(
     except RedisError as exc:
         raise authentication_unavailable() from exc
 
+    except EmailNotVerifiedError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(exc),
+        ) from exc
+
 
 @router.post("/refresh", response_model=TokenResponse)
 async def refresh(
@@ -74,27 +81,6 @@ async def refresh(
 
 
 
-
-# @router.post("/logout", response_model=LogoutResponse)
-# async def logout(
-#     current_user: CurrentUser,
-#     access_token: Annotated[str, Depends(oauth2_scheme)],
-#     session: DatabaseSession,
-# ) -> LogoutResponse:
-#     try:
-#         await AuthService(session).logout(
-#             access_token,
-#             current_user,
-#         )
-#     except RedisError as exc:
-#         raise authentication_unavailable() from exc
-#     except InvalidCredentialsError as exc:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Could not validate credentials.",
-#             headers={"WWW-Authenticate": "Bearer"},
-#         ) from exc
-#     return LogoutResponse(message="Logged out successfully.")
 
 
 
